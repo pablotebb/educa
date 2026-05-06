@@ -38,12 +38,49 @@
             margin-bottom: 20px;
         }
 
+        /* Estilos de las pestañas */
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab-button:hover {
+            color: var(--accent-color);
+        }
+
+        .tab-button.active {
+            color: var(--accent-color);
+            border-bottom-color: var(--accent-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
         .search-container {
             margin-bottom: 20px;
             position: relative;
         }
 
-        #searchInput {
+        #searchInput, #searchInputSumario {
             width: 100%;
             padding: 12px 15px;
             font-size: 16px;
@@ -51,10 +88,10 @@
             border-radius: 25px;
             outline: none;
             transition: border-color 0.3s;
-            box-sizing: border-box; /* Asegura que el padding no desborde el ancho */
+            box-sizing: border-box;
         }
 
-        #searchInput:focus {
+        #searchInput:focus, #searchInputSumario:focus {
             border-color: var(--accent-color);
         }
 
@@ -100,6 +137,15 @@
             color: #777;
             font-style: italic;
         }
+
+        .section-header {
+            background-color: #ecf0f1;
+            font-weight: bold;
+        }
+
+        .subsection {
+            padding-left: 30px;
+        }
     </style>
 </head>
 <body>
@@ -107,33 +153,61 @@
     <div class="container">
         <h1>Índice de Documentos y Aplicaciones</h1>
         
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Buscar por título o palabra clave...">
+        <!-- Pestañas -->
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('index')">Índice de Aplicaciones</button>
+            <button class="tab-button" onclick="switchTab('sumario')">Sumario</button>
         </div>
 
-        <table id="dataTable">
-            <thead>
-                <tr>
-                    <th>Título / Descripción</th>
-                    <th style="width: 80px;">Página</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <!-- Los datos se insertarán aquí mediante JavaScript -->
-            </tbody>
-        </table>
-        <div id="noResults" class="no-results" style="display: none;">No se encontraron resultados.</div>
+        <!-- Pestaña 1: Índice de Aplicaciones -->
+        <div id="tab-index" class="tab-content active">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Buscar por título o palabra clave...">
+            </div>
+
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>Título / Descripción</th>
+                        <th style="width: 80px;">Página</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Los datos se insertarán aquí mediante JavaScript -->
+                </tbody>
+            </table>
+            <div id="noResults" class="no-results" style="display: none;">No se encontraron resultados.</div>
+        </div>
+
+        <!-- Pestaña 2: Sumario -->
+        <div id="tab-sumario" class="tab-content">
+            <div class="search-container">
+                <input type="text" id="searchInputSumario" placeholder="Buscar en el sumario...">
+            </div>
+
+            <table id="sumarioTable">
+                <thead>
+                    <tr>
+                        <th>Sección / Descripción</th>
+                        <th style="width: 80px;">Página</th>
+                    </tr>
+                </thead>
+                <tbody id="sumarioBody">
+                    <!-- Los datos se insertarán aquí mediante JavaScript -->
+                </tbody>
+            </table>
+            <div id="noResultsSumario" class="no-results" style="display: none;">No se encontraron resultados.</div>
+        </div>
     </div>
 
     <script>
-        // Datos extraídos de las imágenes
+        // Datos de la primera tabla (Índice de Aplicaciones)
         const data = [
-            // Imagen 1
             { title: "GESTION - GESTION BONDAD A LOS CENTROS DE LAS DIAS", page: 81 },
             { title: "GESECOM - GESTIÓN ECONÓMICA A LOS CENTROS DE LAS DG", page: 27 },
             { title: "GESTOR DOCUMENTAL DEPARTAMENTAL DE EDUCACION", page: 28 },
             { title: "GIPD - GESTION INTEGRADA DE PERSONAL DOCENTE", page: 29 },
-            { title: "LANZA PINCEL - PINCEL EKADE PARA SERVICIOS GENERALES", page: 30 }, // Sin número claro, omitido o asignado al siguiente grupo
+            { title: "LANZA PINCEL - PINCEL EKADE PARA SERVICIOS GENERALES", page: 30 },
             { title: "MATEDU - APLICACIONES DE GESTION", page: 31 },
             { title: "MAYTE", page: 32 },
             { title: "MINERVA", page: 33 },
@@ -151,8 +225,6 @@
             { title: "REG OFICEN - REGISTRO OFICIAL DE CENTROS", page: 45 },
             { title: "REGOR", page: 46 },
             { title: "SIGECO - SISTEMA DE GESTION ECONÓMICO", page: 47 },
-            
-            // Imagen 3
             { title: "CARPETAS COMPARTIDAS", page: 7 },
             { title: "WEB DE EDUCACION: CAMBIOS, ERRORES", page: 8 },
             { title: "REMISION A RRHH", page: 9 },
@@ -169,12 +241,9 @@
             { title: "DIRCENTROS - DIRECTORIO DE CENTROS", page: 20 },
             { title: "COIN", page: 21 },
             { title: "CONTRATOS - PREVISION DE DESTINOS DE PERSONAL NO DOCENTE", page: 22 },
-            { title: "CUSFORM - CURSOS DE FORMACION DEL PROFESORADO CFPSSCC (CFP)", page: 23 },
             { title: "ENMA: ENVIO MASIVO DE CORREOS", page: 24 },
             { title: "ESCOLARIZACIÓN Y ADMISION", page: 25 },
             { title: "GOCLASIFICADOR - CLASIFICACION DE GESTION DOCUMENTAL", page: 26 },
-
-            // Imagen 4
             { title: "SIRHUS", page: 48 },
             { title: "TABLÓN DE ANUNCIOS DE LA CUCIL", page: 49 },
             { title: "TAL/TIT - TITULOS", page: 50 },
@@ -184,7 +253,6 @@
             { title: "AUTOCAD LT", page: 55 },
             { title: "AUTOCAD REVIT", page: 56 },
             { title: "BUSCAR USUARIOS EN DIRECTORIO ACTIVO", page: 57 },
-            { title: "CARPETAS COMPARTIDAS", page: 58 },
             { title: "CE3X", page: 59 },
             { title: "CONEXION AL DISCO DURO DE UN ORDENDADOR DE USUARIO", page: 60 },
             { title: "CY PE MENU", page: 61 },
@@ -195,11 +263,9 @@
             { title: "SCANER: CONFIGURACION CORREO ELECTRÓNICO", page: 66 },
             { title: "IMPRESORAS - LISTADO TF", page: 67 },
             { title: "IMPRESORAS - CONFIGURACION DE USUARIO", page: 68 },
-
-            // Imagen 2 y 5 (Duplicadas)
             { title: "MICOLLAR - DESBLOQUEO DEL TERMINAL ELECTRONICO", page: 69 },
             { title: "RESTAURAR CONTRASEÑA EN CANON", page: 70 },
-            { title: "PARPADEO DE MONITORES (EQUIPOS TTL)", page: 71 }, // Parpapeo interpretado como Parpadeo
+            { title: "PARPADEO DE MONITORES (EQUIPOS TTL)", page: 71 },
             { title: "SOFTWARE SMART BOARD", page: 72 },
             { title: "PRESTAMO DE MATERIAL", page: 73 },
             { title: "RUNTIME (ACCESS RUNTIME - TODAS LAS VERSIONES)", page: 74 },
@@ -208,9 +274,8 @@
             { title: "ZONA COMPARTIDA EN NUBE", page: 78 },
             { title: "ICCP - CONSULTAS Y CONTACTO", page: 79 },
             { title: "WEB PORTAL DOCENTE Y APP DOCENTE", page: 80 },
-            { title: "WEB PORTAL ...", page: 81 },
             { title: "PROTOCOLO PARA LA CREACIÓN, SUPRESIÓN O MODIFICACION DE CENTROS", page: 82 },
-            { title: "PERSONAL NO DOCENTE: ALTA EN SIRHUS", page: 83 }, // PENSANAL interpretado como Personal
+            { title: "PERSONAL NO DOCENTE: ALTA EN SIRHUS", page: 83 },
             { title: "PINCEL EKADE - ERROR PER CIBERCENTRO", page: 84 },
             { title: "PINCEL EKADE - CENTROS PRIVADOS", page: 85 },
             { title: "MATERIAL DIDÁCTICO TECNOLÓGICO", page: 86 },
@@ -219,10 +284,87 @@
             { title: "FUM Y FCT / PRÁCTICAS DUAL", page: 89 }
         ];
 
+        // Datos del Sumario
+        const sumarioData = [
+            // Sección 1
+            { title: "1 Colas Existentes Listado de Colas OTRS", page: 3, isSection: true },
+            { title: "1.1 C.EDUCACION-GB-C.EDUCACION-ADMISION-INF-PRI-ESO-BACH-M0-AII", page: 5, isSection: false },
+            { title: "1.2 GB C. Educación - Funcionales – NEAE", page: 7, isSection: false },
+            { title: "1.3 GB C. Educación - Funcionales – Personal No Docente", page: 8, isSection: false },
+            { title: "1.4 GB C. Educación – DGP Funcional – Nóminas", page: 9, isSection: false },
+            { title: "1.5 GB C. Educación – DGP Funcional – P.R.L", page: 10, isSection: false },
+            { title: "1.6 GB C. Educación – DGP Funcional – Serv.Jurídicos", page: 11, isSection: false },
+            { title: "1.7 C.EDUCACION::GB. EDUCACION - DGC INCIDENCIAS INFRA CCEE LP", page: 12, isSection: false },
+            { title: "1.8", page: 13, isSection: false },
+            { title: "1.9 GB C. Educación - DGP Funcional – Recursos Humanos", page: 15, isSection: false },
+            { title: "1.10 GB C. Educación - DGP Funcional - Sele.y Provisión", page: 17, isSection: false },
+            { title: "1.11 GB C. Educación – DGP Funcional – Form.Profesorado", page: 19, isSection: false },
+            { title: "1.12 Flujo Colas DGP-Funcionales", page: 20, isSection: false },
+            { title: "1.13 GB C. Educación – DGFPEA", page: 21, isSection: false },
+            { title: "1.14 C.Educación::GB-C. Educación-Oficina-Estadistica Viceconsejería", page: 22, isSection: false },
+            { title: "1.15 C.Educación::GB C. Educación - Funcionales - Exp. Académico", page: 23, isSection: false },
+            { title: "1.16 GB C. Educación - Funcionales – GESTIÓN ECONÓMICA", page: 24, isSection: false },
+            { title: "1.17 GB C. Educación - SGT Explotación – Docentes", page: 25, isSection: false },
+            { title: "1.18 GB C. Educación - SGT Explotación", page: 26, isSection: false },
+            { title: "1.19 C.EDUCACION::GB C.EDUCACION - SGT EXPLOTACION – ADMELECTRONICA", page: 27, isSection: false },
+            { title: "1.20 C.EDUCACION::GB C. EDUCACION - SGT EXPLOTACION – SUMINISTROSTIC", page: 28, isSection: false },
+            { title: "1.21 C.EDUCACION::GB C. EDUCACION - SGT EXPLOTACION – MICRO", page: 29, isSection: false },
+            { title: "1.22 C.EDUCACION::GB C. EDUCACION - AINT GESTION IDENTIDADES", page: 30, isSection: false },
+            { title: "1.23 GB C. Educación – CAUCE (General)", page: 31, isSection: false },
+            
+            // Sección 2
+            { title: "2 Incidencias con tratamiento por correo", page: 36, isSection: true },
+            { title: "2.1 Territorial. Sección Nóminas Docente Las Palmas", page: 36, isSection: false },
+            { title: "2.2 Territorial. Negociado Seguridad Social Docentes Las Palmas", page: 37, isSection: false },
+            { title: "2.3 Territorial. Sección Personal Docente Las Palmas", page: 38, isSection: false },
+            { title: "2.4 Territorial. Sección Nóminas Docente Tenerife", page: 39, isSection: false },
+            { title: "2.5 Territorial. Negociado Seguridad Social Docentes Tenerife", page: 40, isSection: false },
+            { title: "2.6 Territorial. Sección Personal Docente Tenerife", page: 41, isSection: false },
+            { title: "2.7 D.G.Ordenación de las Enseñanzas, Inclusión e Innovación", page: 42, isSection: false },
+            { title: "2.8 Viceconsejería de Educación: formulario único de matrícula", page: 43, isSection: false },
+            { title: "2.9 Inspección de Educación: Gestión de personal de centros privados", page: 44, isSection: false },
+            { title: "2.10 Secretaría General Técnica", page: 45, isSection: false },
+            { title: "2.11 Servicio de Contratación", page: 45, isSection: false },
+            
+            // Sección 3
+            { title: "3 Colas Pendientes de Creación", page: 46, isSection: true },
+            { title: "3.1 Colas de las Territoriales", page: 46, isSection: false },
+            { title: "3.2 Ampliación de Colas Existentes (Propuestas por Viceconsejería de FP)", page: 46, isSection: false },
+            { title: "3.3 Aplicaciones Corporativas", page: 47, isSection: false },
+            
+            // Sección 4
+            { title: "4 Colas Eliminadas", page: 48, isSection: true },
+            { title: "4.1 GB C. Educación - Procedimientos PerDoc", page: 48, isSection: false }
+        ];
+
+        // Elementos del DOM - Tabla 1
         const tableBody = document.getElementById('tableBody');
         const searchInput = document.getElementById('searchInput');
         const noResultsMsg = document.getElementById('noResults');
 
+        // Elementos del DOM - Tabla 2 (Sumario)
+        const sumarioBody = document.getElementById('sumarioBody');
+        const searchInputSumario = document.getElementById('searchInputSumario');
+        const noResultsSumario = document.getElementById('noResultsSumario');
+
+        // Función para cambiar de pestaña
+        function switchTab(tabName) {
+            // Ocultar todos los contenidos
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Desactivar todos los botones
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Activar la pestaña seleccionada
+            document.getElementById('tab-' + tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Renderizar primera tabla
         function renderTable(items) {
             tableBody.innerHTML = '';
             if (items.length === 0) {
@@ -238,7 +380,6 @@
                 titleCell.textContent = item.title;
                 
                 const pageCell = document.createElement('td');
-                // Si la página es un número, lo mostramos, si no, guión
                 const pageDisplay = item.page !== "-" ? item.page : "-";
                 pageCell.innerHTML = item.page !== "-" ? `<span class="page-badge">${item.page}</span>` : '-';
                 
@@ -248,6 +389,37 @@
             });
         }
 
+        // Renderizar tabla del Sumario
+        function renderSumarioTable(items) {
+            sumarioBody.innerHTML = '';
+            if (items.length === 0) {
+                noResultsSumario.style.display = 'block';
+                return;
+            }
+            noResultsSumario.style.display = 'none';
+
+            items.forEach(item => {
+                const row = document.createElement('tr');
+                
+                if (item.isSection) {
+                    row.classList.add('section-header');
+                } else {
+                    row.classList.add('subsection');
+                }
+                
+                const titleCell = document.createElement('td');
+                titleCell.textContent = item.title;
+                
+                const pageCell = document.createElement('td');
+                pageCell.innerHTML = `<span class="page-badge">${item.page}</span>`;
+                
+                row.appendChild(titleCell);
+                row.appendChild(pageCell);
+                sumarioBody.appendChild(row);
+            });
+        }
+
+        // Filtrar primera tabla
         function filterData(query) {
             const lowerQuery = query.toLowerCase();
             const filtered = data.filter(item => 
@@ -257,13 +429,26 @@
             renderTable(filtered);
         }
 
-        // Event Listener para el buscador
+        // Filtrar tabla del Sumario
+        function filterSumarioData(query) {
+            const lowerQuery = query.toLowerCase();
+            const filtered = sumarioData.filter(item => 
+                item.title.toLowerCase().includes(lowerQuery) || 
+                item.page.toString().includes(lowerQuery)
+            );
+            renderSumarioTable(filtered);
+        }
+
+        // Event Listeners
         searchInput.addEventListener('input', (e) => {
             filterData(e.target.value);
         });
 
-        // Renderizado inicial
-        // Ordenamos los datos por número de página para que sea más útil
+        searchInputSumario.addEventListener('input', (e) => {
+            filterSumarioData(e.target.value);
+        });
+
+        // Ordenar y renderizar datos iniciales
         data.sort((a, b) => {
             if (a.page === "-") return 1;
             if (b.page === "-") return -1;
@@ -271,6 +456,7 @@
         });
         
         renderTable(data);
+        renderSumarioTable(sumarioData);
 
     </script>
 </body>

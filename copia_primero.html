@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Índice de Gestión Documental</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            transition: border-color 0.3s;
+            box-sizing: border-box; /* Asegura que el padding no desborde el ancho */
+        }
+
+        #searchInput:focus {
+            border-color: var(--accent-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 1px;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .page-badge {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 0.9em;
+            display: inline-block;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Índice de Documentos y Aplicaciones</h1>
+        
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Buscar por título o palabra clave...">
+        </div>
+
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th>Título / Descripción</th>
+                    <th style="width: 80px;">Página</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Los datos se insertarán aquí mediante JavaScript -->
+            </tbody>
+        </table>
+        <div id="noResults" class="no-results" style="display: none;">No se encontraron resultados.</div>
+    </div>
+
+    <script>
+        // Datos extraídos de las imágenes
+        const data = [
+            // Imagen 1
+            { title: "GESTION - GESTION BONDAD A LOS CENTROS DE LAS DIAS", page: 81 },
+            { title: "GESECOM - GESTIÓN ECONÓMICA A LOS CENTROS DE LAS DG", page: 27 },
+            { title: "GESTOR DOCUMENTAL DEPARTAMENTAL DE EDUCACION", page: 28 },
+            { title: "GIPD - GESTION INTEGRADA DE PERSONAL DOCENTE", page: 29 },
+            { title: "LANZA PINCEL - PINCEL EKADE PARA SERVICIOS GENERALES", page: 30 }, // Sin número claro, omitido o asignado al siguiente grupo
+            { title: "MATEDU - APLICACIONES DE GESTION", page: 31 },
+            { title: "MAYTE", page: 32 },
+            { title: "MINERVA", page: 33 },
+            { title: "NOMINA IBM", page: 34 },
+            { title: "NORAY Y SILTRA", page: 35 },
+            { title: "ORGANIGRAMA", page: 36 },
+            { title: "PAGOS HABILITADOS", page: 37 },
+            { title: "PERIODOS", page: 38 },
+            { title: "PERLA", page: 39 },
+            { title: "PLAN DE ESTUDIOS (PEWEB - PE)", page: 40 },
+            { title: "PORTAFIRMAS", page: 41 },
+            { title: "RESERVA", page: 42 },
+            { title: "REG ORC", page: 43 },
+            { title: "README - WEBSOLDESARROLLO", page: 44 },
+            { title: "REG OFICEN - REGISTRO OFICIAL DE CENTROS", page: 45 },
+            { title: "REGOR", page: 46 },
+            { title: "SIGECO - SISTEMA DE GESTION ECONÓMICO", page: 47 },
+            
+            // Imagen 3
+            { title: "CARPETAS COMPARTIDAS", page: 7 },
+            { title: "WEB DE EDUCACION: CAMBIOS, ERRORES", page: 8 },
+            { title: "REMISION A RRHH", page: 9 },
+            { title: "REMISION A DIRECCIONES GENERALES Y ALISIOS", page: 10 },
+            { title: "RESOLUCION DE TICKET", page: 11 },
+            { title: "APL. DEPARTAMENTALES", page: 12 },
+            { title: "AGAVE - ORGANIGRAMA", page: 13 },
+            { title: "ALISIOS: DERIVAR CONSULTAS SEXENIOS Y TRIENIOS", page: 14 },
+            { title: "APP LISTA DE RESERVA PAS", page: 15 },
+            { title: "BCAAYU", page: 16 },
+            { title: "CUSFORM - CURSOS DE FORMACION DEL PROFESORADO CFPSSCC (CFP)", page: 17 },
+            { title: "CONTROL INTELIGENTE DE APLICACIONES", page: 18 },
+            { title: "DIETAS (GESTION DIETAS)", page: 19 },
+            { title: "DIRCENTROS - DIRECTORIO DE CENTROS", page: 20 },
+            { title: "COIN", page: 21 },
+            { title: "CONTRATOS - PREVISION DE DESTINOS DE PERSONAL NO DOCENTE", page: 22 },
+            { title: "CUSFORM - CURSOS DE FORMACION DEL PROFESORADO CFPSSCC (CFP)", page: 23 },
+            { title: "ENMA: ENVIO MASIVO DE CORREOS", page: 24 },
+            { title: "ESCOLARIZACIÓN Y ADMISION", page: 25 },
+            { title: "GOCLASIFICADOR - CLASIFICACION DE GESTION DOCUMENTAL", page: 26 },
+
+            // Imagen 4
+            { title: "SIRHUS", page: 48 },
+            { title: "TABLÓN DE ANUNCIOS DE LA CUCIL", page: 49 },
+            { title: "TAL/TIT - TITULOS", page: 50 },
+            { title: "RPT, WINPEP Y CONTRATOS", page: 51 },
+            { title: "AÑADIR USUARIO A SCÁNER", page: 53 },
+            { title: "AUTOCAD DWG TRUEVIEN (VISOR)", page: 54 },
+            { title: "AUTOCAD LT", page: 55 },
+            { title: "AUTOCAD REVIT", page: 56 },
+            { title: "BUSCAR USUARIOS EN DIRECTORIO ACTIVO", page: 57 },
+            { title: "CARPETAS COMPARTIDAS", page: 58 },
+            { title: "CE3X", page: 59 },
+            { title: "CONEXION AL DISCO DURO DE UN ORDENDADOR DE USUARIO", page: 60 },
+            { title: "CY PE MENU", page: 61 },
+            { title: "DAMEWARE - CONEXION REMOTA", page: 62 },
+            { title: "DAMEWARE - INSTALACION", page: 63 },
+            { title: "EQUIPOS - INSTALACIONES (PLANILLA)", page: 64 },
+            { title: "SCANER DE MESA: FUJITSU FI6130", page: 65 },
+            { title: "SCANER: CONFIGURACION CORREO ELECTRÓNICO", page: 66 },
+            { title: "IMPRESORAS - LISTADO TF", page: 67 },
+            { title: "IMPRESORAS - CONFIGURACION DE USUARIO", page: 68 },
+
+            // Imagen 2 y 5 (Duplicadas)
+            { title: "MICOLLAR - DESBLOQUEO DEL TERMINAL ELECTRONICO", page: 69 },
+            { title: "RESTAURAR CONTRASEÑA EN CANON", page: 70 },
+            { title: "PARPADEO DE MONITORES (EQUIPOS TTL)", page: 71 }, // Parpapeo interpretado como Parpadeo
+            { title: "SOFTWARE SMART BOARD", page: 72 },
+            { title: "PRESTAMO DE MATERIAL", page: 73 },
+            { title: "RUNTIME (ACCESS RUNTIME - TODAS LAS VERSIONES)", page: 74 },
+            { title: "TABLETAS", page: 75 },
+            { title: "CONFIGURAR FIRMA EN THUNDERBITH", page: 76 },
+            { title: "ZONA COMPARTIDA EN NUBE", page: 78 },
+            { title: "ICCP - CONSULTAS Y CONTACTO", page: 79 },
+            { title: "WEB PORTAL DOCENTE Y APP DOCENTE", page: 80 },
+            { title: "WEB PORTAL ...", page: 81 },
+            { title: "PROTOCOLO PARA LA CREACIÓN, SUPRESIÓN O MODIFICACION DE CENTROS", page: 82 },
+            { title: "PERSONAL NO DOCENTE: ALTA EN SIRHUS", page: 83 }, // PENSANAL interpretado como Personal
+            { title: "PINCEL EKADE - ERROR PER CIBERCENTRO", page: 84 },
+            { title: "PINCEL EKADE - CENTROS PRIVADOS", page: 85 },
+            { title: "MATERIAL DIDÁCTICO TECNOLÓGICO", page: 86 },
+            { title: "OFICER WEB / AULAS MULTISENSORIALES / OTROS", page: 87 },
+            { title: "PORTAL DE CENTROS - MANTENIMIENTO DE PERMISOS", page: 88 },
+            { title: "FUM Y FCT / PRÁCTICAS DUAL", page: 89 }
+        ];
+
+        const tableBody = document.getElementById('tableBody');
+        const searchInput = document.getElementById('searchInput');
+        const noResultsMsg = document.getElementById('noResults');
+
+        function renderTable(items) {
+            tableBody.innerHTML = '';
+            if (items.length === 0) {
+                noResultsMsg.style.display = 'block';
+                return;
+            }
+            noResultsMsg.style.display = 'none';
+
+            items.forEach(item => {
+                const row = document.createElement('tr');
+                
+                const titleCell = document.createElement('td');
+                titleCell.textContent = item.title;
+                
+                const pageCell = document.createElement('td');
+                // Si la página es un número, lo mostramos, si no, guión
+                const pageDisplay = item.page !== "-" ? item.page : "-";
+                pageCell.innerHTML = item.page !== "-" ? `<span class="page-badge">${item.page}</span>` : '-';
+                
+                row.appendChild(titleCell);
+                row.appendChild(pageCell);
+                tableBody.appendChild(row);
+            });
+        }
+
+        function filterData(query) {
+            const lowerQuery = query.toLowerCase();
+            const filtered = data.filter(item => 
+                item.title.toLowerCase().includes(lowerQuery) || 
+                item.page.toString().includes(lowerQuery)
+            );
+            renderTable(filtered);
+        }
+
+        // Event Listener para el buscador
+        searchInput.addEventListener('input', (e) => {
+            filterData(e.target.value);
+        });
+
+        // Renderizado inicial
+        // Ordenamos los datos por número de página para que sea más útil
+        data.sort((a, b) => {
+            if (a.page === "-") return 1;
+            if (b.page === "-") return -1;
+            return a.page - b.page;
+        });
+        
+        renderTable(data);
+
+    </script>
+</body>
+</html>
